@@ -1,14 +1,11 @@
 import { initializeVectorStore, getSimilarQueries } from "./db/store.js";
+import { getVehicles, initialize } from "./db/vehicleDb.js";
 
-let minMatch = 0.15;
+let minMatch = 0.02;
 const index = await initializeVectorStore();
 
 const findVehiclesForQuery = async (queryText) => {
-  const similarUserQueries = await getSimilarQueries(
-    index,
-    "Find me a 2019 Buick",
-    3
-  );
+  const similarUserQueries = await getSimilarQueries(index, queryText, 5);
 
   const set = new Set();
 
@@ -46,21 +43,12 @@ const findVehiclesForQuery = async (queryText) => {
         }
 
         let minScore = minMatch;
+        const myScore = Number.parseFloat(score.toPrecision(2));
+        console.log(`Score: ${myScore}`);
+        console.log(`Min score: ${minScore}`);
+        console.log(`result: ${minScore <= myScore}`);
 
-        console.log(
-          "Score:" +
-            Number.parseFloat(score.toPrecision(2)) +
-            "\nMin score:" +
-            minScore +
-            `\n result: ${
-              minScore <= Number.parseFloat(score.toPrecision(2))
-            }\n`
-        );
-
-        if (
-          !set.has(vector.score) &&
-          minScore <= Number.parseFloat(score.toPrecision(2))
-        ) {
+        if (!set.has(vector.score) && minScore <= myScore) {
           set.add(vector.score);
           console.log("_______________________");
           console.log(
@@ -76,6 +64,17 @@ const findVehiclesForQuery = async (queryText) => {
   }
 };
 
-const myQueryText = `the client is looking for a 2017 Buick Verano`;
+export const runVehicleQuery = async (queryText) => {
+  // const myQueryText = JSON.stringify({year: 2016, make: "Buick"});
+  // const myQueryText = "I am looking for a 2017 Buick";
+  const vehicleIds = await findVehiclesForQuery(queryText);
 
-console.log(await findVehiclesForQuery(myQueryText));
+  if ( vehicleIds.indexOf(',') > 0 ) {
+    await initialize();
+    const dbVehicles = await getVehicles(vehicleIds);
+    console.log(dbVehicles);
+    return dbVehicles;
+  }
+
+  return []
+};

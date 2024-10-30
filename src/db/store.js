@@ -19,7 +19,7 @@ const loadData = async () => {
 
   await pc.createIndex({
     name: indexName,
-    dimension: 2, // Replace with your model dimensions
+    dimension: 3072, // Replace with your model dimensions
     metric: "cosine", // Replace with your model metric
     spec: {
       serverless: {
@@ -86,13 +86,13 @@ const addItemToVectorStore = async (index, vector, id) => {
   });
 };
 
-export const addItem = async (index, row) => {
+export const addItem = async (index, text, vehicleId) => {
   try {
   // get ollama data
-  const embedding = await getEmbedding(row.search);
+  const embedding = await getEmbedding(text);
 
   // add to vector store
-  await addItemToVectorStore(index, embedding[0], row.id);
+  await addItemToVectorStore(index, embedding[0], vehicleId);
   }
   catch(error) {
     console.log(`Error adding item: ${error.message}`)
