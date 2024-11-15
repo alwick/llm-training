@@ -6,13 +6,17 @@
   "type": "module",
   "scripts": {
     "buildDb": "node src/generateDb",
-    "query": "node src/runQuery"
+    "query": "node src/runQuery",
+    "startServer": "node src/server"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "ollama": "^0.5.9",
     "axios": "^1.7.7",
+    "mysql2":"^3.11.4",
+    "express": "^4.21.1",
+    "ollama": "^0.5.9",
+    "sequelize": "^6.37.5",
     "vectra": "^0.9.0"
   }
 }
